@@ -16,19 +16,30 @@ class CPU:
     def load(self):
         """Load a program into memory."""
 
-        address = 0
 
 
         if len(sys.argv) is not 2:
             print(f"usage: {sys.argv[0]} <filename>")
             sys.exit(1)
         
-        program_name = sys.argv[1]
-        # try:
+        try:
+            address = 0
+            program_name = sys.argv[1]
 
+            with open(program_name) as f:
+                for line in f:
+                    num = line.split("#", 1)[0]
 
-        # except FileNotFoundError:
+                    if num.strip() == '':  # ignore comment-only lines
+                        continue
+                    self.ram[address] = bin(num)
+                    address += 1
+            
+            print(self.ram)
 
+        except FileNotFoundError:
+            print(f"{sys.argv[0]}: {sys.argv[1]} not found")
+            sys.exit(2)
         # program = [
         #     # From print8.ls8
         #     0b10000010, # LDI R0,8
