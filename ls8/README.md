@@ -59,11 +59,16 @@ but you'll have to implement those three above instructions first!
 
 ## Step 0: IMPORTANT: inventory what is here!
 
-* Make a list of files here.
-* Write a short 3-10-word description of what each file does.
-* Note what has been implemented, and what hasn't.
-* Read this whole file.
-* Skim the spec.
+[x] - Make a list of files here.
+    * cpu.py
+    * ls8.py
+[x] - Write a short 3-10-word description of what each file does.
+    * cpu.py - The cpu class alu function does simple addition and a trace function
+    * ls*.py - Loads and runs the cpu from cpu.py
+
+[x] - Note what has been implemented, and what hasn't.
+[x] - Read this whole file.
+[x] - Skim the spec.
 
 ## Step 1: Add the constructor to `cpu.py`
 
@@ -105,12 +110,9 @@ value of the stack pointer.
 
 ## Step 3: Implement the core of `CPU`'s `run()` method
 
-This is the workhorse function of the entire processor. It's the most difficult
-part to write.
+This is the workhorse function of the entire processor. It's the most difficult part to write.
 
-It needs to read the memory address that's stored in register `PC`, and store
-that result in `IR`, the _Instruction Register_. This can just be a local
-variable in `run()`.
+It needs to read the memory address that's stored in register `PC`, and store that result in `IR`, the _Instruction Register_. This can just be a local variable in `run()`.
 
 Some instructions requires up to the next two bytes of data _after_ the `PC` in
 memory to perform operations on. Sometimes the byte value is a register number,
@@ -129,7 +131,7 @@ The number of bytes an instruction uses can be determined from the two high bits
 
 ## Step 4: Implement the `HLT` instruction handler
 
-Add the `HLT` instruction define to `cpu.h`.
+Add the `HLT` instruction define to `cpu.py`.
 
 In `run()` in your switch, exit the loop if a `HLT` instruction is encountered,
 regardless of whether or not there are more lines of code in the LS-8 program
@@ -152,6 +154,11 @@ the LS-8 spec.
 
 *At this point, you should be able to run the program and have it print `8` to
 the console!*
+
+
+-------------------------------------- End day one --------------------------------------------
+
+
 
 ## Step 7: Un-hardcode the machine code
 
