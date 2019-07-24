@@ -5,10 +5,13 @@ HALT           = 2
 PRINT_NUM      = 3
 SAVE_REGISTER  = 4
 PRINT_REGISTER = 5
+PUSH           = 6
+POP            = 7
 ​
 memory = [0] * 128
 ​
 register = [0] * 8   # 8 registers
+sp = 7
 ​
 pc = 0 # Program Counter, points to currently-executing instruction
 ​
@@ -35,6 +38,8 @@ try:
 except FileNotFoundError:
     print(f"{sys.argv[0]}: {sys.argv[1]} not found")
     sys.exit(2)
+
+registers[sp] = 127
 ​
 while running:
     command = memory[pc]
@@ -62,6 +67,20 @@ while running:
     elif command == HALT:
         running = False
         pc += 1
+    
+    elif command == PUSH:
+        resgisters[sp] -= 1             # decrement the stack pointer
+        regnum = memory[pc + 1]         # get the register number operand
+        value = registers[regnum]       # get the value from that register
+        memory[registers[sp]] = value   # store that value in memory at the sp
+        pc += 2
+
+    elif command == POP:
+        value = memory[registers[sp]]   # get value from memory at AT
+        regnum = memory[pc + 1]         # get the register number operand
+        registers[regnum] = value       #store the value from the stack in the register
+        registers[sp] += 1              # increment the stack pointer
+        pc += 2
 ​
     else:
         print(f"unknown instruction {command}")

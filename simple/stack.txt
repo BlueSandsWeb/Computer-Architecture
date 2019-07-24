@@ -1,0 +1,9 @@
+4   # save_register 99, R2
+99
+2
+6   # PUSH R2
+7
+1   # POP R1
+5
+1   # PRINT_REGISTER R1
+2   # HALT
