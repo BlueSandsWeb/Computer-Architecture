@@ -11,7 +11,40 @@ class CPU:
         self.ram = [0] * 256
         self.pc = 0
 
-        pass
+        self.branchtable = {}
+        self.branchtable[int(0b10100000)] = self.handle_ADD
+        self.branchtable[int(0b10100011)] = self.handle_SUB
+        self.branchtable[int(0b10100010)] = self.handle_MUL
+        self.branchtable[int(0b10100011)] = self.handle_DIV
+        # self.branchtable[int(0b01001000)] = self.handle_PRA
+        self.branchtable[int(0b01000111)] = self.handle_PRN
+        self.branchtable[int(0b10000010)] = self.handle_LDI
+        # self.branchtable[int(0b00000001)] = self.handle_HLT
+
+    def handle_ADD(self, operand_a, operand_b):     #  ADD
+        self.alu("ADD", operand_a, operand_b)
+        self.pc += 3
+    def handle_SUB(self, operand_a, operand_b):     # Subtract
+        self.alu("SUB", operand_a, operand_b)
+        self.pc += 3
+    def handle_MUL(self, operand_a, operand_b):     # Multiply
+        self.alu("MUL", operand_a, operand_b)
+        self.pc += 3
+    def handle_DIV(self, operand_a, operand_b):     # Divide
+        self.alu("DIV", operand_a, operand_b)
+        self.pc += 3
+
+    # def handle_PRA(self, operand_a, operand_b):     # 
+
+    def handle_PRN(self, operand_a, operand_b):     # Print number in register
+        print(f'{self.register[operand_a]}')
+        self.pc += 2
+    def handle_LDI(self, operand_a, operand_b):     # LDI: 
+        self.register[operand_a] = operand_b
+        self.pc += 3
+
+    def dispatch(self, IR, opA, opB):
+        self.branchtable[IR](opA, opB)
 
     def load(self):
         """Load a program into memory."""
@@ -32,7 +65,9 @@ class CPU:
 
                     if num.strip() == '':  # ignore comment-only lines
                         continue
-                    self.ram[address] = bin(num)
+                    num = '0b' + num
+                    # print(num)
+                    self.ram[address] = int(num, 2)
                     address += 1
             
             print(self.ram)
@@ -40,19 +75,6 @@ class CPU:
         except FileNotFoundError:
             print(f"{sys.argv[0]}: {sys.argv[1]} not found")
             sys.exit(2)
-        # program = [
-        #     # From print8.ls8
-        #     0b10000010, # LDI R0,8
-        #     0b00000000,
-        #     0b00001000,
-        #     0b01000111, # PRN R0
-        #     0b00000000,
-        #     0b00000001, # HLT
-        # ]
-
-        # for instruction in program:
-        #     self.ram[address] = instruction
-        #     address += 1
 
     def ram_read(self, address):
         return self.ram[address]
@@ -65,8 +87,13 @@ class CPU:
         """ALU operations."""
 
         if op == "ADD":
-            self.reg[reg_a] += self.reg[reg_b]
-        #elif op == "SUB": etc
+            self.register[reg_a] += self.register[reg_b]
+        elif op == "SUB":
+            self.register[reg_a] -= self.register[reg_b]
+        elif op == "MUL":
+            self.register[reg_a] *= self.register[reg_b]
+        elif op == "DIV":
+            self.register[reg_a] /= self.register[reg_b]
         else:
             raise Exception("Unsupported ALU operation")
 
@@ -99,23 +126,65 @@ class CPU:
             operand_a = self.ram_read(IR + 1)
             operand_b = self.ram_read(IR + 2)
             # print("IR: ", IR)
-            # print("self.ram[IR]: ", bin(self.ram[IR]))
-            if self.ram[IR] == 0b00000001:
+            if self.ram[IR] == int(0b00000001):               # HLT base case: exit loop
+                print("HALT")
                 running = False
+            else:
+                # print(self.ram[IR])
+                self.dispatch(self.ram[IR], operand_a, operand_b)
+
+            # elif self.ram[IR] == 0b10000010:                # LDI (Load register)
+            #     self.register[operand_a] = operand_b
+            #     self.pc += 3
             
-            elif self.ram[IR] == 0b10000010:
-                self.register[operand_a] = operand_b
-                self.pc += 3
+            # elif self.ram[IR] == 0b01000111:                # Print
+            #     print(f'{self.register[operand_a]}')
+            #     self.pc += 2
+
+            # elif self.ram[IR] == 0b10100010:                # Multiply
+            #     self.alu("MUL", operand_a, operand_b)
+            #     self.pc += 3
+            # elif self.ram[IR] == 0b10100000:                # ADD
+            #     self.alu("ADD", operand_a, operand_b)
+            #     self.pc += 3
+            # elif self.ram[IR] == 0b10100001:                # Subtract
+            #     self.alu("SUB", operand_a, operand_b)
+            #     self.pc += 3            
+            # elif self.ram[IR] == 0b10100011:                # divide
+            #     self.alu("DIV", operand_a, operand_b)
+            #     self.pc += 3
             
-            elif self.ram[IR] == 0b01000111:
-                # print("THINGS")
-                # print("operand_a: ", operand_a)
-                print(f'{self.register[operand_a]}')
-                self.pc += 2
-            
-cpu = CPU()
+# cpu = CPU()
 # # cpu.ram_write(55, 0)
 # # print(f"CPU RAM: {cpu.ram}")
 # # print(f"CPU RAM_READ: {cpu.ram_read(0)}" )
-cpu.load()
+# cpu.load()
 # cpu.run()
+
+
+
+
+
+
+# ========================= Dispatcher Class =================== #
+
+# command = {
+#     “HLT”: 0b00000001,
+#     “ADD”: 0b10100000,
+#     “SUB”: 0b10100011,
+#     “MUL”: 0b10100010,
+#     “DIV”: 0b10100011,
+#     “PRA”: 0b01001000,
+#     “PRN”: 0b01000111,
+#     “LDI”: 0b10000010
+# }
+
+# class BranchTable:
+#     def __init__(self):
+#         self.branchtable = {}
+#         self.branchtable[0b10100000] = self.handle_ADD
+#         self.branchtable[0b10100010] = self.handle_MUL
+#         # self.branchtable[] = self.handle_SUB
+#         # self.branchtable[] = self.handle_SUB
+    
+#     def handle_MUL(self, "MUL", operand_a, operand_b):
