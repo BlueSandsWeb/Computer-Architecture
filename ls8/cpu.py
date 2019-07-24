@@ -49,8 +49,6 @@ class CPU:
     def load(self):
         """Load a program into memory."""
 
-
-
         if len(sys.argv) is not 2:
             print(f"usage: {sys.argv[0]} <filename>")
             sys.exit(1)
