@@ -1,0 +1,15 @@
+3   # PRINT_NUM 12
+12
+4   # SAVE_REGISTER [subroutine address], R0
+12 # [subroutine address] which is the 12th instruction
+0
+8   # CALL R0
+0
+3   #PRINT_NUM 24
+24
+2   #HALT
+
+#subroutine
+1   # PRINT_BEEJ [Address 12]
+1   # PRINT_BEEJ
+9   # RET

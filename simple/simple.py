@@ -81,7 +81,21 @@ while running:
         registers[regnum] = value       #store the value from the stack in the register
         registers[sp] += 1              # increment the stack pointer
         pc += 2
-​
+
+    elif command == CALL:
+        return_address = pc + 2                 # get address of instruction right after this CALL instruction
+        resgisters[sp] -= 1                     # decrement the stack pointer
+        memory[registers[sp]] = return_address  # store that value in memory at the stack pointer
+        
+        regnum = memory[pc + 1]
+        subroutine_address = register[regnum]
+        pc = subroutine_address
+    
+    elif command == RET:
+        return_address = memory[register[sp]]
+        register[sp] += 1
+        pc = return_address
+
     else:
         print(f"unknown instruction {command}")
         sys.exit(1)
