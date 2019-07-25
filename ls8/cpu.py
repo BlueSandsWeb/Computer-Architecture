@@ -23,6 +23,8 @@ class CPU:
         self.branchtable[int(0b10000010)] = self.handle_LDI
         self.branchtable[int(0b01000110)] = self.sudo_pop
         self.branchtable[int(0b01000101)] = self.sudo_push
+        self.branchtable[int(0b01010000)] = self.call
+        self.branchtable[int(0b00010001)] = self.ret
 
     # ================= Dispatcher functions ================== #
     # ======== ALU functions ====== #
@@ -61,6 +63,17 @@ class CPU:
         self.register[7] += 1
         self.register[operand_a] = self.ram[self.register[7]]
         self.pc += 2
+
+    def call(self, operand_a, operand_b):
+        # store pc += 2 on stack
+        self.ram[self.register[7]] = self.pc + 2
+        self.register[7] -= 1
+        # send pc to operand_a
+        self.pc = self.register[operand_a]
+
+    def ret(self, operand_a, operand_b):
+        self.register[7] += 1
+        self.pc = self.ram[self.register[7]]
 
     # ================= Dispatcher Function ================== #
 
@@ -149,8 +162,7 @@ class CPU:
             IR = self.pc
             operand_a = self.ram_read(IR + 1)
             operand_b = self.ram_read(IR + 2)
-            # self.trace()
-            # print("I0R: ", IR)
+            self.trace()
             if self.ram[IR] == int(0b00000001):               # HLT base case: exit loop
                 print("HALT")
                 running = False
